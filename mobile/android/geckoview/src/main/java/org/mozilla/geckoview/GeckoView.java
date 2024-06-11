@@ -276,7 +276,7 @@ public class GeckoView extends FrameLayout implements GeckoDisplay.NewSurfacePro
     final StateListDrawable drawable = new StateListDrawable();
     drawable.addState(
         new int[] {android.R.attr.state_focused, -android.R.attr.state_focused},
-        new ColorDrawable(Color.WHITE));
+        new ColorDrawable(Color.TRANSPARENT));
     setBackground(drawable);
 
     // This will stop PropertyAnimator from creating a drawing cache (i.e. a
@@ -285,7 +285,7 @@ public class GeckoView extends FrameLayout implements GeckoDisplay.NewSurfacePro
     setWillNotCacheDrawing(false);
 
     mSurfaceWrapper = new SurfaceViewWrapper(getContext());
-    mSurfaceWrapper.setBackgroundColor(Color.WHITE);
+    mSurfaceWrapper.setBackgroundColor(Color.TRANSPARENT);
     addView(
         mSurfaceWrapper.getView(),
         new ViewGroup.LayoutParams(
@@ -315,10 +315,13 @@ public class GeckoView extends FrameLayout implements GeckoDisplay.NewSurfacePro
    */
   public void coverUntilFirstPaint(final int color) {
     mLastCoverColor = color;
+    //mLastCoverColor = Color.TRANSPARENT;
     if (mSession != null) {
       mSession.getCompositorController().setClearColor(color);
+      //mSession.getCompositorController().setClearColor(Color.TRANSPARENT);
     }
     coverUntilFirstPaintInternal(color);
+    //coverUntilFirstPaintInternal(Color.TRANSPARENT);
   }
 
   private void uncover() {
@@ -424,7 +427,8 @@ public class GeckoView extends FrameLayout implements GeckoDisplay.NewSurfacePro
 
   // TODO: Bug 1670805 this should really be configurable
   // Default dark color for about:blank, keep it in sync with PresShell.cpp
-  static final int DEFAULT_DARK_COLOR = 0xFF2A2A2E;
+  //static final int DEFAULT_DARK_COLOR = 0xFF2A2A2E;
+  static final int DEFAULT_DARK_COLOR = Color.TRANSPARENT;
 
   private int defaultColor() {
     // If the app set a default color, just use that
@@ -433,11 +437,11 @@ public class GeckoView extends FrameLayout implements GeckoDisplay.NewSurfacePro
     }
 
     if (mSession == null || !mSession.isOpen()) {
-      return Color.WHITE;
+      return Color.TRANSPARENT;
     }
 
     // ... otherwise use the prefers-color-scheme color
-    return mSession.getRuntime().usesDarkTheme() ? DEFAULT_DARK_COLOR : Color.WHITE;
+    return mSession.getRuntime().usesDarkTheme() ? DEFAULT_DARK_COLOR : Color.TRANSPARENT;
   }
 
   /**

@@ -19,7 +19,7 @@ public final class CompositorController {
   private final GeckoSession.Compositor mCompositor;
 
   private List<Runnable> mDrawCallbacks;
-  private int mDefaultClearColor = Color.WHITE;
+  private int mDefaultClearColor = Color.TRANSPARENT;
   private Runnable mFirstPaintCallback;
 
   /* package */ CompositorController(final GeckoSession session) {
@@ -100,6 +100,7 @@ public final class CompositorController {
     ThreadUtils.assertOnUiThread();
 
     mDefaultClearColor = color;
+    //mDefaultClearColor = Color.TRANSPARENT;
     if (mCompositor.isReady()) {
       mCompositor.setDefaultClearColor(mDefaultClearColor);
     }

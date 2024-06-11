@@ -36,8 +36,10 @@ public class SurfaceViewWrapper {
 
   private void initSurfaceView(final Context context) {
     mSurfaceView = new MagnifiableSurfaceView(context);
+    mSurfaceView.setZOrderOnTop(true);
+    //mSurfaceView.setZOrderMediaOverlay(true);
     mSurfaceView.setBackgroundColor(Color.TRANSPARENT);
-    mSurfaceView.getHolder().setFormat(PixelFormat.TRANSPARENT);
+    mSurfaceView.getHolder().setFormat(PixelFormat.TRANSLUCENT);
     mView = mSurfaceView;
   }
 
@@ -64,6 +66,7 @@ public class SurfaceViewWrapper {
   public void setBackgroundColor(final int color) {
     if (mSurfaceView != null) {
       mSurfaceView.setBackgroundColor(color);
+      //mSurfaceView.setBackgroundColor(Color.TRANSPARENT);
     } else {
       Log.e(LOGTAG, "TextureView doesn't support background color.");
     }
