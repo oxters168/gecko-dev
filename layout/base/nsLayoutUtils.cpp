@@ -2920,6 +2920,7 @@ void nsLayoutUtils::PaintFrame(gfxContext* aRenderingContext, nsIFrame* aFrame,
 
   nsIFrame* displayRoot = GetDisplayRootFrame(aFrame);
 
+  // release_force_transparent_bg: commenting out the following lines has no visible effect
   if (aFlags & PaintFrameFlags::WidgetLayers) {
     nsView* view = aFrame->GetView();
     if (!(view && view->GetWidget() && displayRoot == aFrame)) {
@@ -2927,6 +2928,7 @@ void nsLayoutUtils::PaintFrame(gfxContext* aRenderingContext, nsIFrame* aFrame,
       NS_ASSERTION(aRenderingContext, "need a rendering context");
     }
   }
+  // release_force_transparent_bg: commenting out until here
 
   nsPresContext* presContext = aFrame->PresContext();
   PresShell* presShell = presContext->PresShell();
@@ -2944,6 +2946,7 @@ void nsLayoutUtils::PaintFrame(gfxContext* aRenderingContext, nsIFrame* aFrame,
 
   // Only allow retaining for painting when preffed on, and for root frames
   // (since the modified frame tracking is per-root-frame).
+  // release_force_transparent_bg: forcing retainDisplayList to be true/false has no visible effect
   const bool retainDisplayList =
       isForPainting && AreRetainedDisplayListsEnabled() && !aFrame->GetParent();
 
@@ -3010,25 +3013,31 @@ void nsLayoutUtils::PaintFrame(gfxContext* aRenderingContext, nsIFrame* aFrame,
     nsDisplayListBuilder::IncrementPaintSequenceNumber();
   }
 
+  // release_force_transparent_bg: commenting out the following if block has no visible effect
   if (aFlags & PaintFrameFlags::InTransform) {
     builder->SetInTransform(true);
   }
+  // release_force_transparent_bg: commenting out the following if block has no visible effect
   if (aFlags & PaintFrameFlags::SyncDecodeImages) {
     builder->SetSyncDecodeImages(true);
   }
+  // release_force_transparent_bg: commenting out the following if block causes only the black background to be drawn
   if (aFlags & (PaintFrameFlags::WidgetLayers | PaintFrameFlags::ToWindow)) {
     builder->SetPaintingToWindow(true);
   }
+  // release_force_transparent_bg: commenting out the following if block has no visible effect
   if (aFlags & PaintFrameFlags::UseHighQualityScaling) {
     builder->SetUseHighQualityScaling(true);
   }
+  // release_force_transparent_bg: commenting out the following if block has no visible effect
   if (aFlags & PaintFrameFlags::ForWebRender) {
     builder->SetPaintingForWebRender(true);
   }
+  // release_force_transparent_bg: commenting out the following if block has no visible effect
   if (aFlags & PaintFrameFlags::IgnoreSuppression) {
     builder->IgnorePaintSuppression();
   }
-
+  // release_force_transparent_bg: commenting out the following if block has no visible effect
   if (BrowsingContext* bc = presContext->Document()->GetBrowsingContext()) {
     builder->SetInActiveDocShell(bc->IsActive());
   }
@@ -3046,6 +3055,7 @@ void nsLayoutUtils::PaintFrame(gfxContext* aRenderingContext, nsIFrame* aFrame,
   }
 
   // If we are in a remote browser, then apply clipping from ancestor browsers
+  // release_force_transparent_bg: commenting out the following if block has no visible effect
   if (BrowserChild* browserChild = BrowserChild::GetFrom(presShell)) {
     if (!browserChild->IsTopLevel()) {
       const nsRect unscaledVisibleRect =
@@ -3055,6 +3065,7 @@ void nsLayoutUtils::PaintFrame(gfxContext* aRenderingContext, nsIFrame* aFrame,
   }
 
   builder->ClearHaveScrollableDisplayPort();
+  // release_force_transparent_bg: commenting out the following if block has no visible effect
   if (builder->IsPaintingToWindow() &&
       nsLayoutUtils::AsyncPanZoomEnabled(aFrame)) {
     DisplayPortUtils::MaybeCreateDisplayPortInFirstScrollFrameEncountered(
@@ -3062,6 +3073,7 @@ void nsLayoutUtils::PaintFrame(gfxContext* aRenderingContext, nsIFrame* aFrame,
   }
 
   nsIFrame* rootScrollFrame = presShell->GetRootScrollFrame();
+  // release_force_transparent_bg: commenting out the following if block has no visible effect
   if (rootScrollFrame && !aFrame->GetParent()) {
     nsIScrollableFrame* rootScrollableFrame =
         presShell->GetRootScrollFrameAsScrollable();
@@ -3108,6 +3120,7 @@ void nsLayoutUtils::PaintFrame(gfxContext* aRenderingContext, nsIFrame* aFrame,
         presContext, canvasArea.Size()));
   }
 
+  // release_force_transparent_bg: commenting out the following if block has no visible effect
   if (ignoreViewportScrolling && rootScrollFrame) {
     nsIScrollableFrame* rootScrollableFrame =
         presShell->GetRootScrollFrameAsScrollable();
@@ -3159,6 +3172,7 @@ void nsLayoutUtils::PaintFrame(gfxContext* aRenderingContext, nsIFrame* aFrame,
     nsDisplayListBuilder::AutoCurrentActiveScrolledRootSetter asrSetter(
         builder);
 
+    // release_force_transparent_bg: commenting out the following if and else block has no visible effect
     if (presShell->GetDocument() &&
         presShell->GetDocument()->IsRootDisplayDocument() &&
         !presShell->GetRootScrollFrame()) {
@@ -3202,19 +3216,19 @@ void nsLayoutUtils::PaintFrame(gfxContext* aRenderingContext, nsIFrame* aFrame,
     // If a pref is toggled that adds or removes display list items,
     // we need to rebuild the display list. The pref may be toggled
     // manually by the user, or during test setup.
-    if (retainDisplayList &&
-        !builder->ShouldRebuildDisplayListDueToPrefChange()) {
-      // Attempt to do a partial build and merge into the existing list.
-      // This calls BuildDisplayListForStacking context on a subset of the
-      // viewport.
-      updateState = retainedBuilder->AttemptPartialUpdate(aBackstop);
-      metrics->EndPartialBuild(updateState);
-    } else {
-      // Partial updates are disabled.
-      DL_LOGI("Partial updates are disabled");
-      metrics->mPartialUpdateResult = PartialUpdateResult::Failed;
-      metrics->mPartialUpdateFailReason = PartialUpdateFailReason::Disabled;
-    }
+//    if (retainDisplayList &&
+//        !builder->ShouldRebuildDisplayListDueToPrefChange()) {
+//      // Attempt to do a partial build and merge into the existing list.
+//      // This calls BuildDisplayListForStacking context on a subset of the
+//      // viewport.
+//      updateState = retainedBuilder->AttemptPartialUpdate(aBackstop);
+//      metrics->EndPartialBuild(updateState);
+//    } else {
+//      // Partial updates are disabled.
+//      DL_LOGI("Partial updates are disabled");
+//      metrics->mPartialUpdateResult = PartialUpdateResult::Failed;
+//      metrics->mPartialUpdateFailReason = PartialUpdateFailReason::Disabled;
+//    }
 
     // Rebuild the full display list if the partial display list build failed.
     bool doFullRebuild = updateState == PartialUpdateResult::Failed;
@@ -3226,6 +3240,7 @@ void nsLayoutUtils::PaintFrame(gfxContext* aRenderingContext, nsIFrame* aFrame,
       doFullRebuild = true;
     }
 
+    // release_force_transparent_bg: commenting out the following lines causes only the black background to be drawn
     if (doFullRebuild) {
       if (retainDisplayList) {
         retainedBuilder->ClearRetainedData();
@@ -3246,9 +3261,11 @@ void nsLayoutUtils::PaintFrame(gfxContext* aRenderingContext, nsIFrame* aFrame,
       DL_LOGI("Starting full display list build, root frame: %p",
               builder->RootReferenceFrame());
 
+      // release_force_transparent_bg: commenting out the following lines causes only the black background to be drawn
       aFrame->BuildDisplayListForStackingContext(builder, list);
       AddExtraBackgroundItems(builder, list, aFrame, canvasArea, visibleRegion,
                               aBackstop);
+      // release_force_transparent_bg: commenting out until here
 
       builder->LeavePresShell(aFrame, list);
       metrics->EndFullBuild();
@@ -3256,6 +3273,7 @@ void nsLayoutUtils::PaintFrame(gfxContext* aRenderingContext, nsIFrame* aFrame,
       DL_LOGI("Finished full display list build");
       updateState = PartialUpdateResult::Updated;
     }
+    // release_force_transparent_bg: commenting out until here
 
     builder->SetIsBuilding(false);
     builder->IncrementPresShellPaintCount(presShell);
@@ -3308,7 +3326,8 @@ void nsLayoutUtils::PaintFrame(gfxContext* aRenderingContext, nsIFrame* aFrame,
     PrintHitTestInfoStats(list);
   }
 #endif
-
+  // release_force_transparent_bg: commenting out the following lines stops drawing both background
+  // and what's on top (becuase of the PaintRoot() call)
   TimeStamp paintStart = TimeStamp::Now();
   list->PaintRoot(builder, aRenderingContext, flags, Some(geckoDLBuildTime));
   Telemetry::AccumulateTimeDelta(Telemetry::PAINT_RASTERIZE_TIME, paintStart);
@@ -3321,7 +3340,7 @@ void nsLayoutUtils::PaintFrame(gfxContext* aRenderingContext, nsIFrame* aFrame,
   if (consoleNeedsDisplayList) {
     DumpAfterPaintDisplayList(ss, builder, list);
   }
-
+  // release_force_transparent_bg: commenting out until here
 #ifdef MOZ_DUMP_PAINTING
   gfxUtils::sDumpPaintFile = savedDumpFile;
 #endif

@@ -6561,7 +6561,8 @@ void PresShell::PaintInternal(nsView* aViewToPaint, PaintInternalFlags aFlags) {
     frame->RemoveStateBits(NS_FRAME_UPDATE_LAYER_TREE);
   }
 
-  nscolor bgcolor = ComputeBackstopColor(aViewToPaint);
+//  nscolor bgcolor = ComputeBackstopColor(aViewToPaint);
+  nscolor bgcolor = NS_RGBA(0, 0, 255, 32);
   PaintFrameFlags flags =
       PaintFrameFlags::WidgetLayers | PaintFrameFlags::ExistingTransaction;
 
@@ -6579,6 +6580,8 @@ void PresShell::PaintInternal(nsView* aViewToPaint, PaintInternalFlags aFlags) {
 
   if (frame) {
     // We can paint directly into the widget using its layer manager.
+    // IMPORTANT: This is the call that actually draws, so whatever is causing the black background
+    // happens somewhere in here
     nsLayoutUtils::PaintFrame(nullptr, frame, nsRegion(), bgcolor,
                               nsDisplayListBuilderMode::Painting, flags);
     return;
