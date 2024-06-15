@@ -1001,6 +1001,7 @@ nsDisplayListBuilder::~nsDisplayListBuilder() {
 
 uint32_t nsDisplayListBuilder::GetBackgroundPaintFlags() {
   uint32_t flags = 0;
+  // release_force_transparent_bg: commenting out the following if blocks has no visible effect
   if (mSyncDecodeImages) {
     flags |= nsCSSRendering::PAINTBG_SYNC_DECODE_IMAGES;
   }
@@ -1098,9 +1099,11 @@ void nsDisplayListBuilder::EnterPresShell(const nsIFrame* aReferenceFrame,
                                   nsLayoutPhase::DisplayListBuilding);
 #endif
 
+  // release_force_transparent_bg: commenting out the following UpdateCanvasBackground call has no visible effect
   state->mPresShell->UpdateCanvasBackground();
 
   bool buildCaret = mBuildCaret;
+  // release_force_transparent_bg: commenting out the following if/else block and setting mIsBackgroundOnly to false has no visible effect
   if (mIgnoreSuppression || !state->mPresShell->IsPaintingSuppressed()) {
     state->mIsBackgroundOnly = false;
   } else {
@@ -1230,6 +1233,7 @@ void nsDisplayListBuilder::LeavePresShell(const nsIFrame* aReferenceFrame,
 
   if (mIsPaintingToWindow && aPaintedContents) {
     nsPresContext* pc = aReferenceFrame->PresContext();
+    // release_force_transparent_bg: commenting out the following if block has no visible effect
     if (!pc->HadNonBlankPaint()) {
       if (!CurrentPresShellState()->mIsBackgroundOnly &&
           DisplayListIsNonBlank(aPaintedContents)) {
@@ -2255,6 +2259,7 @@ void nsDisplayList::PaintRoot(nsDisplayListBuilder* aBuilder, gfxContext* aCtx,
     }
   });
 
+  // release_force_transparent_bg: commenting out the following if block has no visible effect
   if (!renderer) {
     if (!aCtx) {
       NS_WARNING("Nowhere to paint into");
@@ -2267,6 +2272,7 @@ void nsDisplayList::PaintRoot(nsDisplayListBuilder* aBuilder, gfxContext* aCtx,
     return;
   }
 
+  // release_force_transparent_bg: commenting out the following if block crashes the app when starting the geckoview
   if (renderer->GetBackendType() == LayersBackend::LAYERS_WR) {
     MOZ_ASSERT(layerManager);
     if (doBeginTransaction) {
@@ -2281,6 +2287,7 @@ void nsDisplayList::PaintRoot(nsDisplayListBuilder* aBuilder, gfxContext* aCtx,
       }
     }
 
+    // release_force_transparent_bg: settings SetIsCompositingCheap parameter to false has no visible effect
     bool prevIsCompositingCheap = aBuilder->SetIsCompositingCheap(true);
     layerManager->SetTransactionIdAllocator(presContext->RefreshDriver());
 
@@ -2290,6 +2297,7 @@ void nsDisplayList::PaintRoot(nsDisplayListBuilder* aBuilder, gfxContext* aCtx,
       sent = layerManager->EndEmptyTransaction();
     }
 
+    // release_force_transparent_bg: commenting out the following if block stops anything from being drawn
     if (!sent) {
       auto* wrManager = static_cast<WebRenderLayerManager*>(layerManager.get());
 
@@ -2297,11 +2305,13 @@ void nsDisplayList::PaintRoot(nsDisplayListBuilder* aBuilder, gfxContext* aCtx,
       WrFiltersHolder wrFilters;
       gfx::Matrix5x4* colorMatrix =
           nsDocShell::Cast(docShell)->GetColorMatrix();
+      // release_force_transparent_bg: commenting out the following if block has no visible effect
       if (colorMatrix) {
         wrFilters.filters.AppendElement(
             wr::FilterOp::ColorMatrix(colorMatrix->components));
       }
 
+      // release_force_transparent_bg: commenting out the following EndTransactionWithoutLayer function stops anything from being drawn
       wrManager->EndTransactionWithoutLayer(this, aBuilder,
                                             std::move(wrFilters), nullptr,
                                             aDisplayListBuildTime.valueOr(0.0));

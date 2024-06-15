@@ -358,6 +358,7 @@ void WebRenderLayerManager::EndTransactionWithoutLayer(
     mDLBuilder->DumpSerializedDisplayList();
   }
 
+  // release_force_transparent_bg: commenting out the following if/else block causes only the black background to be drawn
   if (aDisplayList) {
     MOZ_ASSERT(aDisplayListBuilder && !aBackground);
     mDisplayItemCache.SetDisplayList(aDisplayListBuilder, aDisplayList);

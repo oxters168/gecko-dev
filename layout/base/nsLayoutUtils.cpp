@@ -3216,19 +3216,20 @@ void nsLayoutUtils::PaintFrame(gfxContext* aRenderingContext, nsIFrame* aFrame,
     // If a pref is toggled that adds or removes display list items,
     // we need to rebuild the display list. The pref may be toggled
     // manually by the user, or during test setup.
-//    if (retainDisplayList &&
-//        !builder->ShouldRebuildDisplayListDueToPrefChange()) {
-//      // Attempt to do a partial build and merge into the existing list.
-//      // This calls BuildDisplayListForStacking context on a subset of the
-//      // viewport.
-//      updateState = retainedBuilder->AttemptPartialUpdate(aBackstop);
-//      metrics->EndPartialBuild(updateState);
-//    } else {
-//      // Partial updates are disabled.
-//      DL_LOGI("Partial updates are disabled");
-//      metrics->mPartialUpdateResult = PartialUpdateResult::Failed;
-//      metrics->mPartialUpdateFailReason = PartialUpdateFailReason::Disabled;
-//    }
+    // release_force_transparent_bg: commenting out the following if and else block has no visible effect
+    if (retainDisplayList &&
+        !builder->ShouldRebuildDisplayListDueToPrefChange()) {
+      // Attempt to do a partial build and merge into the existing list.
+      // This calls BuildDisplayListForStacking context on a subset of the
+      // viewport.
+      updateState = retainedBuilder->AttemptPartialUpdate(aBackstop);
+      metrics->EndPartialBuild(updateState);
+    } else {
+      // Partial updates are disabled.
+      DL_LOGI("Partial updates are disabled");
+      metrics->mPartialUpdateResult = PartialUpdateResult::Failed;
+      metrics->mPartialUpdateFailReason = PartialUpdateFailReason::Disabled;
+    }
 
     // Rebuild the full display list if the partial display list build failed.
     bool doFullRebuild = updateState == PartialUpdateResult::Failed;
@@ -3240,7 +3241,7 @@ void nsLayoutUtils::PaintFrame(gfxContext* aRenderingContext, nsIFrame* aFrame,
       doFullRebuild = true;
     }
 
-    // release_force_transparent_bg: commenting out the following lines causes only the black background to be drawn
+    // release_force_transparent_bg: commenting out the following if block causes only the black background to be drawn
     if (doFullRebuild) {
       if (retainDisplayList) {
         retainedBuilder->ClearRetainedData();
@@ -3273,7 +3274,6 @@ void nsLayoutUtils::PaintFrame(gfxContext* aRenderingContext, nsIFrame* aFrame,
       DL_LOGI("Finished full display list build");
       updateState = PartialUpdateResult::Updated;
     }
-    // release_force_transparent_bg: commenting out until here
 
     builder->SetIsBuilding(false);
     builder->IncrementPresShellPaintCount(presShell);
@@ -3293,8 +3293,10 @@ void nsLayoutUtils::PaintFrame(gfxContext* aRenderingContext, nsIFrame* aFrame,
 #ifdef MOZ_DUMP_PAINTING
   FILE* savedDumpFile = gfxUtils::sDumpPaintFile;
 #endif
+  // release_force_transparent_bg: commenting out the rest of the function from here stops anything from being drawn
 
   UniquePtr<std::stringstream> ss;
+  // release_force_transparent_bg: commenting out the following if block has no visible change
   if (consoleNeedsDisplayList) {
     ss = MakeUnique<std::stringstream>();
     *ss << "Display list for " << uri << "\n";
@@ -3302,8 +3304,11 @@ void nsLayoutUtils::PaintFrame(gfxContext* aRenderingContext, nsIFrame* aFrame,
   }
 
   uint32_t flags = nsDisplayList::PAINT_DEFAULT;
+  // release_force_transparent_bg: commenting out the following if block stops anything from being drawn
   if (aFlags & PaintFrameFlags::WidgetLayers) {
+    // release_force_transparent_bg: commenting out the following flag or operation stops anything from being drawn
     flags |= nsDisplayList::PAINT_USE_WIDGET_LAYERS;
+    // release_force_transparent_bg: commenting out the following if block has no visible effect
     if (!(aFlags & PaintFrameFlags::DocumentRelative)) {
       nsIWidget* widget = aFrame->GetNearestWidget();
       if (widget) {
@@ -3314,9 +3319,11 @@ void nsLayoutUtils::PaintFrame(gfxContext* aRenderingContext, nsIFrame* aFrame,
       }
     }
   }
+  // release_force_transparent_bg: commenting out the following if block has no visible effect
   if (aFlags & PaintFrameFlags::ExistingTransaction) {
     flags |= nsDisplayList::PAINT_EXISTING_TRANSACTION;
   }
+  // release_force_transparent_bg: commenting out the following if block has no visible effect
   if (updateState == PartialUpdateResult::NoChange && !aRenderingContext) {
     flags |= nsDisplayList::PAINT_IDENTICAL_DISPLAY_LIST;
   }
@@ -3326,9 +3333,8 @@ void nsLayoutUtils::PaintFrame(gfxContext* aRenderingContext, nsIFrame* aFrame,
     PrintHitTestInfoStats(list);
   }
 #endif
-  // release_force_transparent_bg: commenting out the following lines stops drawing both background
-  // and what's on top (becuase of the PaintRoot() call)
   TimeStamp paintStart = TimeStamp::Now();
+  // release_force_transparent_bg: commenting out the PaintRoot call stops anything from being drawn
   list->PaintRoot(builder, aRenderingContext, flags, Some(geckoDLBuildTime));
   Telemetry::AccumulateTimeDelta(Telemetry::PAINT_RASTERIZE_TIME, paintStart);
 
@@ -3340,10 +3346,10 @@ void nsLayoutUtils::PaintFrame(gfxContext* aRenderingContext, nsIFrame* aFrame,
   if (consoleNeedsDisplayList) {
     DumpAfterPaintDisplayList(ss, builder, list);
   }
-  // release_force_transparent_bg: commenting out until here
 #ifdef MOZ_DUMP_PAINTING
   gfxUtils::sDumpPaintFile = savedDumpFile;
 #endif
+  // release_force_transparent_bg: commenting out the rest of the function from here has no visible effect
 
   // Update the widget's opaque region information. This sets
   // glass boundaries on Windows. Also set up the window dragging region.

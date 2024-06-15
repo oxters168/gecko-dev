@@ -122,6 +122,7 @@ bool WebRenderBridgeChild::EndTransaction(
   }
 
   mSentDisplayList = true;
+  // release_force_transparent_bg: commenting out the following SendSetDisplayList call and setting ret to true/false stops anything from being drawn
   bool ret = this->SendSetDisplayList(
       std::move(aDisplayListData), mDestroyedActors, GetFwdTransactionId(),
       aTransactionId, aContainsSVGGroup, aVsyncId, aVsyncStartTime,

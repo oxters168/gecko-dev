@@ -1331,6 +1331,7 @@ impl DisplayListBuilder {
         bounds: LayoutRect,
         color: ColorF,
     ) {
+        // release_force_transparent_bg: commenting out the following function block has no visible effect
         let item = di::DisplayItem::Rectangle(di::RectangleDisplayItem {
             common: *common,
             color: PropertyBinding::Value(color),

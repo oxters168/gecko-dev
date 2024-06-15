@@ -194,6 +194,7 @@ bool FallbackRenderer::BeginTransaction(const nsCString& aURL) {
 
 void FallbackRenderer::EndTransactionWithColor(const nsIntRect& aRect,
                                                const gfx::DeviceColor& aColor) {
+  // release_force_transparent_bg: commenting out the following FillRect call has no visible effect
   mTarget->GetDrawTarget()->FillRect(Rect(aRect), ColorPattern(aColor));
 }
 
